@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>格價 - 價格比較工具</title>
+    <style>
+        :root {
+            --primary: #ffb7c5;
+            --secondary: #b5d8eb;
+            --accent: #ffd3b6;
+            --light: #e8f5e9;
+            --text: #5a5a5a;
+            --shadow: rgba(0,0,0,0.1);
+            --crown: #ffd700;
+        }
+        
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #fde2e4, #e2ece9, #bee1e6);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #ff6b8b;
+            text-shadow: 2px 2px 4px var(--shadow);
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            color: var(--text);
+            margin-bottom: 20px;
+        }
+        
+        .card {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #666;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            background-color: white;
+        }
+        
+        input:focus, select:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .form-row > div {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px var(--shadow);
+        }
+        
+        button:hover {
+            background-color: #ff8da1;
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #9cc7dc;
+        }
+        
+        .btn-delete {
+            background-color: #ffb7c5;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-delete:hover {
+            background-color: #ff8da1;
+        }
+        
+        .item-list {
+            margin-top: 30px;
+        }
+        
+        .list-group {
+            margin-bottom: 30px;
+        }
+        
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 2px solid var(--accent);
+            font-weight: 600;
+        }
+        
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .list-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-info {
+            flex-grow: 1;
+        }
+        
+        .item-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .crown-icon {
+            color: var(--crown);
+            margin-right: 5px;
+            font-size: 1.2em;
+        }
+        
+        .item-details {
+            color: #777;
+            font-size: 0.9em;
+        }
+        
+        .item-price {
+            font-weight: 600;
+            color: #ff6b8b;
+            text-align: right;
+            white-space: nowrap;
+            margin-left: 10px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .action-buttons button {
+            flex: 1;
+        }
+        
+        .no-items {
+            text-align: center;
+            padding: 20px;
+            color: #888;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #888;
+            font-size: 0.9em;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .form-row > div {
+                width: 100%;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+        
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tab-button {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.7);
+            border: none;
+            padding: 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text);
+            transition: all 0.3s;
+        }
+        
+        .tab-button.active {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 10px var(--shadow);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>格價</h1>
+            <div class="subtitle">價格比較小助手</div>
+        </header>
+        
+        <div class="tab-buttons">
+            <button class="tab-button active" data-tab="add-tab">添加記錄</button>
+            <button class="tab-button" data-tab="view-tab">查看比較</button>
+        </div>
+        
+        <div id="add-tab" class="tab-content active">
+            <div class="card">
+                <form id="price-form">
+                    <div class="form-group">
+                        <label for="item-name">品名</label>
+                        <input type="text" id="item-name" list="item-list" placeholder="例如：藍莓、維他命C等" required>
+                        <datalist id="item-list"></datalist>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="price">價格 (總價)</label>
+                            <input type="number" id="price" min="0" step="0.01" placeholder="HK$" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="quantity">數量</label>
+                            <input type="number" id="quantity" min="0" step="0.01" placeholder="粒數/毫升/克" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dosage">劑量 (若適用)</label>
+                            <input type="number" id="dosage" min="0" step="0.01" placeholder="例如：每粒含多少毫克">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="dosage-unit">劑量單位</label>
+                            <select id="dosage-unit">
+                                <option value="mg">毫克 (mg)</option>
+                                <option value="mcg">微克 (mcg)</option>
+                                <option value="g">克 (g)</option>
+                                <option value="IU">國際單位 (IU)</option>
+                                <option value="ml">毫升 (ml)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="location">購買地點</label>
+                        <input type="text" id="location" list="locations-list" placeholder="例如：超市/藥房名稱" required>
+                        <datalist id="locations-list"></datalist>
+                    </div>
+                    
+                    <button type="submit" id="submit-btn">添加記錄</button>
+                </form>
+            </div>
+        </div>
+        
+        <div id="view-tab" class="tab-content">
+            <div class="card">
+                <div class="item-list" id="item-container">
+                    <!-- 分組的項目將在此顯示 -->
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="export-btn" class="btn-secondary">匯出Excel檔案</button>
+                    <button id="clear-btn">清除所有資料</button>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            © 2025 格價 - 本地儲存價格比較工具
+        </footer>
+    </div>
+    
+    <script>
+        // 儲存所有項目的主數組
+        let items = [];
+        // 已知產品名稱列表
+        let knownItems = [
+            '可可粉（1湯匙）',
+            '巴西果仁（1粒）',
+            '合桃（2粒）',
+            '夏威夷果仁（5粒）',
+            '乳酪',
+            '奇亞籽（1湯匙）',
+            '杞子（10粒）',
+            'Tart cherries（3粒）',
+            '藍莓（10粒）',
+            '士多啤梨（適量）',
+            '雜莓（適量）',
+            'NMN（175mg）',
+            '新ビオフェルミンS錠（3粒）',
+            'Biotin（50mcg）',
+            'Q10（50mg）',
+            '維他命C（500mg）',
+            '維他命D（5000IU）',
+            '維他命K2（100mcg）',
+            'Cod liver oil（500–1500mg，每日兩次）',
+            'Magnesium glycinate（200mg，睡前）'
+        ];
+        // 已知購買地點列表
+        let knownLocations = [];
+
+        // DOM 元素
+        const form = document.getElementById('price-form');
+        const itemNameInput = document.getElementById('item-name');
+        const priceInput = document.getElementById('price');
+        const quantityInput = document.getElementById('quantity');
+        const dosageInput = document.getElementById('dosage');
+        const dosageUnitSelect = document.getElementById('dosage-unit');
+        const locationInput = document.getElementById('location');
+        const itemContainer = document.getElementById('item-container');
+        const exportBtn = document.getElementById('export-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const itemListDatalist = document.getElementById('item-list');
+        const locationsListDatalist = document.getElementById('locations-list');
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        // 初始化應用程序
+        function init() {
+            loadItems();
+            updateItemList();
+            populateDatalist();
+            setupEventListeners();
+        }
+
+        // 從 localStorage 加載項目
+        function loadItems() {
+            const storedItems = localStorage.getItem('priceComparisonItems');
+            if (storedItems) {
+                items = JSON.parse(storedItems);
+            }
+            
+            const storedLocations = localStorage.getItem('knownLocations');
+            if (storedLocations) {
+                knownLocations = JSON.parse(storedLocations);
+            }
+        }
+
+        // 保存項目到 localStorage
+        function saveItems() {
+            localStorage.setItem('priceComparisonItems', JSON.stringify(items));
+            localStorage.setItem('knownLocations', JSON.stringify(knownLocations));
+        }
+
+        // 填充數據列表
+        function populateDatalist() {
+            // 清空現有選項
+            itemListDatalist.innerHTML = '';
+            locationsListDatalist.innerHTML = '';
+            
+            // 添加已知的品名
+            knownItems.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item;
+                itemListDatalist.appendChild(option);
+            });
+            
+            // 添加已知的購買地點
+            knownLocations.forEach(location => {
+                const option = document.createElement('option');
+                option.value = location;
+                locationsListDatalist.appendChild(option);
+            });
+        }
+
+        // 設置事件監聽器
+        function setupEventListeners() {
+            // 表單提交
+            form.addEventListener('submit', handleFormSubmit);
+            
+            // 匯出按鈕
+            exportBtn.addEventListener('click', exportToExcel);
+            
+            // 清除按鈕
+            clearBtn.addEventListener('click', clearAllData);
+            
+            // 選項卡切換
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+                    
+                    // 移除所有選項卡和內容的活動狀態
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // 激活當前選項卡和內容
+                    button.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+        }
+
+        // 處理表單提交
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            // 獲取表單值
+            const name = itemNameInput.value.trim();
+            const price = parseFloat(priceInput.value);
+            const quantity = parseFloat(quantityInput.value);
+            const dosage = dosageInput.value ? parseFloat(dosageInput.value) : null;
+            const dosageUnit = dosageUnitSelect.value;
+            const location = locationInput.value.trim();
+            const date = new Date().toISOString().split('T')[0]; // 今天的日期 YYYY-MM-DD
+            
+            // 計算單價
+            let unitPrice, unitPriceLabel;
+            if (dosage) {
+                unitPrice = price / (quantity * dosage);
+                unitPriceLabel = `每${dosageUnit}`;
+            } else {
+                unitPrice = price / quantity;
+                unitPriceLabel = "每單位";
+            }
+            
+            // 創建新項目
+            const newItem = {
+                id: Date.now(), // 使用時間戳作為唯一ID
+                name,
+                price,
+                quantity,
+                dosage,
+                dosageUnit: dosage ? dosageUnit : null,
+                location,
+                date,
+                unitPrice,
+                unitPriceLabel
+            };
+            
+            // 添加到數組
+            items.push(newItem);
+            
+            // 如果這是一個新項目名稱，添加到已知項目列表
+            if (!knownItems.includes(name)) {
+                knownItems.push(name);
+            }
+            
+            // 如果這是一個新購買地點，添加到已知地點列表
+            if (!knownLocations.includes(location)) {
+                knownLocations.push(location);
+                populateDatalist();
+            }
+            
+            // 保存並更新顯示
+            saveItems();
+            updateItemList();
+            
+            // 重置表單 (保留產品名稱)
+            priceInput.value = '';
+            quantityInput.value = '';
+            dosageInput.value = '';
+            locationInput.value = '';
+            
+            // 顯示成功消息
+            alert('項目已添加！');
+        }
+
+        // 更新項目列表顯示
+        function updateItemList() {
+            // 首先清空容器
+            itemContainer.innerHTML = '';
+            
+            if (items.length === 0) {
+                itemContainer.innerHTML = '<div class="no-items">尚未添加任何項目</div>';
+                return;
+            }
+            
+            // 按名稱分組
+            const groupedItems = {};
+            items.forEach(item => {
+                if (!groupedItems[item.name]) {
+                    groupedItems[item.name] = [];
+                }
+                groupedItems[item.name].push(item);
+            });
+            
+            // 為每個分組顯示項目
+            for (const [name, group] of Object.entries(groupedItems)) {
+                // 對分組內的項目按單價排序
+                group.sort((a, b) => a.unitPrice - b.unitPrice);
+                
+                // 創建分組元素
+                const groupElement = document.createElement('div');
+                groupElement.className = 'list-group';
+                
+                // 創建組標題
+                const groupHeader = document.createElement('div');
+                groupHeader.className = 'list-header';
+                groupHeader.textContent = name;
+                groupElement.appendChild(groupHeader);
+                
+                // 遍歷組中的每個項目
+                group.forEach((item, index) => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'list-item';
+                    
+                    const itemInfo = document.createElement('div');
+                    itemInfo.className = 'item-info';
+                    
+                    const itemTitle = document.createElement('div');
+                    itemTitle.className = 'item-title';
+                    
+                    // 如果是該組中最便宜的項目，添加皇冠圖標
+                    if (index === 0) {
+                        const crownIcon = document.createElement('span');
+                        crownIcon.className = 'crown-icon';
+                        crownIcon.textContent = '👑';
+                        itemTitle.appendChild(crownIcon);
+                    }
+                    
+                    const titleText = document.createElement('span');
+                    titleText.textContent = `${item.location} (${item.date})`;
+                    itemTitle.appendChild(titleText);
+                    
+                    const itemDetails = document.createElement('div');
+                    itemDetails.className = 'item-details';
+                    
+                    if (item.dosage) {
+                        itemDetails.textContent = `HK$${item.price.toFixed(2)} / ${item.quantity}個 (每個${item.dosage}${item.dosageUnit})`;
+                    } else {
+                        itemDetails.textContent = `HK$${item.price.toFixed(2)} / ${item.quantity}個`;
+                    }
+                    
+                    itemInfo.appendChild(itemTitle);
+                    itemInfo.appendChild(itemDetails);
+                    
+                    const itemPrice = document.createElement('div');
+                    itemPrice.className = 'item-price';
+                    
+                    const priceValue = document.createElement('div');
+                    priceValue.textContent = `HK$${item.unitPrice.toFixed(4)}`;
+                    
+                    const priceLabel = document.createElement('div');
+                    priceLabel.textContent = item.unitPriceLabel;
+                    priceLabel.style.fontSize = '0.8em';
+                    priceLabel.style.color = '#888';
+                    
+                    itemPrice.appendChild(priceValue);
+                    itemPrice.appendChild(priceLabel);
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'btn-delete';
+                    deleteBtn.textContent = '刪除';
+                    deleteBtn.onclick = () => deleteItem(item.id);
+                    
+                    itemElement.appendChild(itemInfo);
+                    itemElement.appendChild(itemPrice);
+                    itemElement.appendChild(deleteBtn);
+                    
+                    groupElement.appendChild(itemElement);
+                });
+                
+                itemContainer.appendChild(groupElement);
+            }
+        }
+
+        // 刪除項目
+        function deleteItem(id) {
+            if (confirm('確定要刪除此項目嗎？')) {
+                items = items.filter(item => item.id !== id);
+                saveItems();
+                updateItemList();
+            }
+        }
+
+        // 匯出到Excel
+        function exportToExcel() {
+            if (items.length === 0) {
+                alert('沒有資料可以匯出');
+                return;
+            }
+            
+            // 準備CSV內容
+            let csvContent = "品名,價格,數量,劑量,劑量單位,購買地點,購買日期,單價,單價標籤\n";
+            
+            items.forEach(item => {
+                const row = [
+                    item.name,
+                    item.price,
+                    item.quantity,
+                    item.dosage || '',
+                    item.dosageUnit || '',
+                    item.location,
+                    item.date,
+                    item.unitPrice,
+                    item.unitPriceLabel
+                ].map(value => `"${value}"`).join(',');
+                
+                csvContent += row + '\n';
+            });
+            
+            // 創建下載連結
+            const encodedUri = encodeURI('data:text/csv;charset=utf-8,' + csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', `格價資料_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            
+            // 觸發下載
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // 清除所有數據
+        function clearAllData() {
+            if (confirm('確定要清除所有資料嗎？此操作無法撤銷！')) {
+                items = [];
+                saveItems();
+                updateItemList();
+            }
+        }
+
+        // 初始化應用程序
+        document.addEventListener('DOMContentLoaded', init);
+
+        // 添加 SheetJS 腳本以支持 Excel 導出
+        // 由於您要求不依賴外部 CDN，這裡簡化為 CSV 導出
+        // 若要實現真正的 Excel .xlsx 導出，需要加載 SheetJS 庫
+    </script>
+</body>
+</html>
